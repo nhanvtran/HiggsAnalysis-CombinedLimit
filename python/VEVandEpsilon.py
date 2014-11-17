@@ -58,8 +58,8 @@ class MepsHiggs(SMLikeHiggsModel):
 
         self.modelBuilder.doVar("SM_VEV[246.22]")
         self.msbar = {
-            'top' : (160, (-4.3,+4.8)),
-            'b'   : (4.18, (-0.03,+0.03)),
+            'top' : (172.5, (-4.3,+4.8)),
+            'b'   : (2.7645, (-0.03,+0.03)),
             'tau' : (1.77682, (-0.16,+0.16)),
             'mu'  : (0.105658, (-0.0000035,+0.0000035)),
             'W'   : (80.385, (-0.015,+0.015)),
@@ -128,7 +128,7 @@ class MepsHiggs(SMLikeHiggsModel):
         self.modelBuilder.factory_('expr::Meps_BRscal_hzg("@0/@1", Scaling_hzg, Meps_Gscal_tot)')
         self.modelBuilder.factory_('expr::Meps_BRscal_hcc("@0*@0/@1", Ctau, Meps_Gscal_tot)')
         self.modelBuilder.factory_('expr::Meps_BRscal_hss("@0*@0/@1", Cb, Meps_Gscal_tot)')
-        self.modelBuilder.factory_('expr::Meps_BRscal_hgluglu("@0*@0/@1", Scaling_hgluglu, Meps_Gscal_tot)')
+        self.modelBuilder.factory_('expr::Meps_BRscal_hgluglu("@0/@1", Scaling_hgluglu, Meps_Gscal_tot)')
         
         self.modelBuilder.out.Print()
 
@@ -224,16 +224,17 @@ class ResolvedC6(SMLikeHiggsModel):
         ## partial widths, normalized to the SM one, for decays scaling with F, V and total
         for d in [ "htt", "hbb", "hcc", "hww", "hzz", "hgluglu", "htoptop", "hgg", "hzg", "hmm", "hss" ]:
             self.SMH.makeBR(d)
-        self.modelBuilder.factory_('expr::wztbtm_Gscal_w("@0*@0 * @1", CW, SM_BR_hww)') 
-        self.modelBuilder.factory_('expr::wztbtm_Gscal_z("@0*@0 * @1", CZ, SM_BR_hzz)') 
-        self.modelBuilder.factory_('expr::wztbtm_Gscal_b("@0*@0 * @1", Cb, SM_BR_hbb)') 
-        self.modelBuilder.factory_('expr::wztbtm_Gscal_tau("@0*@0 * @1", Ctau, SM_BR_htt)') 
-        self.modelBuilder.factory_('expr::wztbtm_Gscal_mu("@0*@0 * @1", Cmu, SM_BR_hmm)') 
-        self.modelBuilder.factory_('expr::wztbtm_Gscal_top("@0*@0 * @1", Ctop, SM_BR_htoptop)') 
-        self.modelBuilder.factory_('expr::wztbtm_Gscal_glu("@0 * @1", Scaling_hgluglu, SM_BR_hgluglu)') 
-        self.modelBuilder.factory_('expr::wztbtm_Gscal_gg("@0 * @1", Scaling_hgg, SM_BR_hgg)') 
-        self.modelBuilder.factory_('expr::wztbtm_Gscal_zg("@0 * @1", Scaling_hzg, SM_BR_hzg)') 
-        self.modelBuilder.factory_('sum::wztbtm_Gscal_tot(wztbtm_Gscal_w, wztbtm_Gscal_z, wztbtm_Gscal_b, wztbtm_Gscal_tau, wztbtm_Gscal_mu, wztbtm_Gscal_top, wztbtm_Gscal_glu, wztbtm_Gscal_gg, wztbtm_Gscal_zg, SM_BR_hcc, SM_BR_hss)')
+	self.modelBuilder.factory_('sum::norm_sumAllBR(SM_BR_hbb, SM_BR_htt, SM_BR_hmm, SM_BR_hss, SM_BR_hzz, SM_BR_hww, SM_BR_hcc, SM_BR_htoptop, SM_BR_hzg,SM_BR_hgg,SM_BR_hgluglu)')
+        self.modelBuilder.factory_('expr::wztbtm_Gscal_w("@0*@0 * @1/@2", CW, SM_BR_hww, norm_sumAllBR)') 
+        self.modelBuilder.factory_('expr::wztbtm_Gscal_z("@0*@0 * @1/@2", CZ, SM_BR_hzz,norm_sumAllBR)') 
+        self.modelBuilder.factory_('expr::wztbtm_Gscal_b("@0*@0 * @1/@2", Cb, SM_BR_hbb,norm_sumAllBR)') 
+        self.modelBuilder.factory_('expr::wztbtm_Gscal_tau("@0*@0 * @1/@2", Ctau, SM_BR_htt,norm_sumAllBR)') 
+        self.modelBuilder.factory_('expr::wztbtm_Gscal_mu("@0*@0 * @1/@2", Cmu, SM_BR_hmm,norm_sumAllBR)') 
+        self.modelBuilder.factory_('expr::wztbtm_Gscal_top("@0*@0 * @1/@2", Ctop, SM_BR_htoptop,norm_sumAllBR)') 
+        self.modelBuilder.factory_('expr::wztbtm_Gscal_glu("@0 * @1/@2", Scaling_hgluglu, SM_BR_hgluglu,norm_sumAllBR)') 
+        self.modelBuilder.factory_('expr::wztbtm_Gscal_gg("@0 * @1/@2", Scaling_hgg, SM_BR_hgg,norm_sumAllBR)') 
+        self.modelBuilder.factory_('expr::wztbtm_Gscal_zg("@0 * @1/@2", Scaling_hzg, SM_BR_hzg,norm_sumAllBR)') 
+        self.modelBuilder.factory_('expr::wztbtm_Gscal_tot("@0+@1+@2+@3+@4+@5+@6+@7+@8+@9/@11+@10/@11", wztbtm_Gscal_w, wztbtm_Gscal_z, wztbtm_Gscal_b, wztbtm_Gscal_tau, wztbtm_Gscal_mu, wztbtm_Gscal_top, wztbtm_Gscal_glu, wztbtm_Gscal_gg, wztbtm_Gscal_zg, SM_BR_hcc, SM_BR_hss, norm_sumAllBR)')
         ## BRs, normalized to the SM ones: they scale as (coupling/coupling_SM)^2 / (totWidth/totWidthSM)^2 
         self.modelBuilder.factory_('expr::wztbtm_BRscal_hww("@0*@0/@1", CW, wztbtm_Gscal_tot)')
         self.modelBuilder.factory_('expr::wztbtm_BRscal_hzz("@0*@0/@1", CZ, wztbtm_Gscal_tot)')
